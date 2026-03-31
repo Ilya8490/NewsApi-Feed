@@ -26,6 +26,17 @@ export function FeedClient({ initialArticles, initialSavedUrls }: FeedClientProp
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [error, setError] = useState("");
+
+  function mergeArticles(current: Article[], incoming: Article[]) {
+    const seen = new Map(current.map((article) => [article.url, article]));
+
+    for (const article of incoming) {
+      seen.set(article.url, article);
+    }
+
+    return Array.from(seen.values());
+  }
 
   const filterKey = useMemo(() => {
     const params = new URLSearchParams({
@@ -42,6 +53,7 @@ export function FeedClient({ initialArticles, initialSavedUrls }: FeedClientProp
   const loadFeed = useCallback(
     async (nextPage: number, replace = false) => {
       setLoading(true);
+      setError("");
       try {
         const params = new URLSearchParams({
           page: String(nextPage),
@@ -53,6 +65,10 @@ export function FeedClient({ initialArticles, initialSavedUrls }: FeedClientProp
         });
 
         const response = await fetch(`/api/feed?${params.toString()}`);
+        if (!response.ok) {
+          const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+          throw new Error(payload?.message || "Unable to load the personalized feed right now.");
+        }
         const json = (await response.json()) as FeedResponse;
 
         const nextArticles = json.articles.map((article) => ({
@@ -60,9 +76,11 @@ export function FeedClient({ initialArticles, initialSavedUrls }: FeedClientProp
           isSaved: initialSavedUrls.includes(article.url) || Boolean(article.isSaved)
         }));
 
-        setArticles((current) => (replace ? nextArticles : [...current, ...nextArticles]));
+        setArticles((current) => (replace ? nextArticles : mergeArticles(current, nextArticles)));
         setHasMore(json.hasMore);
         setPage(nextPage);
+      } catch (fetchError) {
+        setError(fetchError instanceof Error ? fetchError.message : "Unable to load the personalized feed right now.");
       } finally {
         setLoading(false);
       }
@@ -89,6 +107,17 @@ export function FeedClient({ initialArticles, initialSavedUrls }: FeedClientProp
   );
 
   const visibleArticles = favoritesOnly ? articles.filter((article) => article.isSaved) : articles;
+
+  if (error && visibleArticles.length === 0) {
+    return (
+      <EmptyState
+        title="We couldn’t load your feed"
+        description={error}
+        ctaHref="/"
+        ctaLabel="Try again"
+      />
+    );
+  }
 
   if (!loading && visibleArticles.length === 0) {
     return (
