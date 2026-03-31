@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 214 36% 98%;
+  --foreground: 222 32% 13%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 32% 13%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 32% 13%;
+  --primary: 221 83% 53%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 30% 20%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 44%;
+  --accent: 162 73% 46%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214 31% 91%;
+  --input: 214 31% 91%;
+  --ring: 221 83% 53%;
+  --radius: 1rem;
+  --font-sans: "Instrument Sans", "Inter", sans-serif;
+  --font-display: "Manrope", "Instrument Sans", sans-serif;
+}
+
+.dark {
+  --background: 222 47% 8%;
+  --foreground: 210 40% 96%;
+  --card: 222 42% 11%;
+  --card-foreground: 210 40% 96%;
+  --popover: 222 42% 11%;
+  --popover-foreground: 210 40% 96%;
+  --primary: 213 94% 68%;
+  --primary-foreground: 222 47% 11%;
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 96%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 70%;
+  --accent: 166 76% 42%;
+  --accent-foreground: 210 40% 96%;
+  --destructive: 0 63% 50%;
+  --destructive-foreground: 210 40% 96%;
+  --border: 217 33% 20%;
+  --input: 217 33% 20%;
+  --ring: 213 94% 68%;
+}
+
+* {
+  @apply border-border;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  background-image: theme("backgroundImage.mesh-light");
+  min-height: 100vh;
+}
+
+.dark body {
+  background-image: theme("backgroundImage.mesh-dark");
+}
+
+::selection {
+  @apply bg-primary/20;
+}
+
+.glass-panel {
+  @apply border border-white/50 bg-white/70 shadow-soft backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/50;
+}
+
+.news-grid {
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+}
